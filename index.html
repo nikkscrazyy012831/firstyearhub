@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<title>FirstYearHub Portal</title>
+<style>
+body {margin:0; font-family:Arial; display:flex; height:100vh;}
+.sidebar {width:240px; background:#0b63d6; color:white; padding:20px;}
+.sidebar h2 {margin-top:0;}
+.sidebar a {display:block; color:white; text-decoration:none; margin:12px 0; font-size:17px;}
+.main {flex:1; padding:20px; overflow-y:auto;}
+.section {margin-bottom:25px;}
+.folder {background:#e8f0ff; padding:12px; border-radius:8px; margin:8px 0; cursor:pointer;}
+.folder-content {display:none; padding:10px 20px;}
+.sem1 {color:#0b63d6;}
+.sem2 {color:#0a8a3a;}
+.card {background:#f5f5f5; padding:15px; border-radius:8px; margin:10px 0;}
+input,select {padding:8px; margin:6px 0; width:250px;}
+button {padding:8px 14px; background:#0b63d6; color:white; border:none; border-radius:5px; cursor:pointer;}
+.hidden {display:none;}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<h2>FirstYearHub</h2>
+<a href="#" onclick="show('dash')">Dashboard</a>
+<a href="#" onclick="show('sem1')">Semester 1</a>
+<a href="#" onclick="show('sem2')">Semester 2</a>
+<a href="#" onclick="show('assign')">Assignments</a>
+<a href="#" onclick="show('owner')">Owner Panel</a>
+</div>
+
+<div class="main">
+
+<div id="dash" class="page">
+<h1>Welcome to FirstYearHub</h1>
+<div class='card'>A redesigned student portal with subjects, assignments, and admin upload.</div>
+</div>
+
+<div id="sem1" class="page hidden">
+<h2 class="sem1">Semester 1 Subjects</h2>
+<div class="folder" onclick="toggleFolder('p1')">Physics</div>
+<div id="p1" class="folder-content">Physics question papers here.</div>
+
+<div class="folder" onclick="toggleFolder('m1')">Maths</div>
+<div id="m1" class="folder-content">Maths question papers here.</div>
+
+<div class="folder" onclick="toggleFolder('ieee')">IEEE</div>
+<div id="ieee" class="folder-content">IEEE question papers here.</div>
+
+<div class="folder" onclick="toggleFolder('mfr')">MFR</div>
+<div id="mfr" class="folder-content">MFR question papers here.</div>
+
+<div class="folder" onclick="toggleFolder('cpps1')">CPPS</div>
+<div id="cpps1" class="folder-content">CPPS question papers here.</div>
+</div>
+
+<div id="sem2" class="page hidden">
+<h2 class="sem2">Semester 2 Subjects</h2>
+
+<div class="folder" onclick="toggleFolder('cgd')">CGD</div>
+<div id="cgd" class="folder-content">CGD question papers here.</div>
+
+<div class="folder" onclick="toggleFolder('cst')">CST</div>
+<div id="cst" class="folder-content">CST question papers here.</div>
+
+<div class="folder" onclick="toggleFolder('cpps2')">CPPS</div>
+<div id="cpps2" class="folder-content">CPPS question papers here.</div>
+
+<div class="folder" onclick="toggleFolder('maths2')">Maths</div>
+<div id="maths2" class="folder-content">Maths question papers here.</div>
+
+<div class="folder" onclick="toggleFolder('ese')">ESE</div>
+<div id="ese" class="folder-content">ESE question papers here.</div>
+</div>
+
+<div id="assign" class="page hidden">
+<h2>Assignments</h2>
+<div id="assignmentList" class="card">No assignments uploaded yet.</div>
+</div>
+
+<div id="owner" class="page hidden">
+<h2>Owner Upload Panel</h2>
+<div id="unlockDiv">
+<input id="pw" placeholder="Enter owner password">
+<button onclick="unlock()">Unlock</button>
+</div>
+
+<div id="uploadDiv" class="hidden">
+<select id="subj">
+<option value="">Select Subject</option>
+<option>Physics</option><option>Maths</option><option>IEEE</option>
+<option>MFR</option><option>CPPS (Sem1)</option>
+<option>CGD</option><option>CST</option><option>CPPS (Sem2)</option>
+<option>Maths (Sem2)</option><option>ESE</option>
+</select><br>
+<input id="fileName" placeholder="Enter file name"><br>
+<button onclick="addAssignment()">Upload Assignment</button>
+</div>
+</div>
+
+</div>
+
+<script>
+function show(id){
+ document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+ document.getElementById(id).classList.remove('hidden');
+}
+
+function toggleFolder(id){
+ let x=document.getElementById(id);
+ x.style.display = x.style.display==='block' ? 'none' : 'block';
+}
+
+const OWNER_PASSWORD="1234";
+function unlock(){
+ if(document.getElementById("pw").value==OWNER_PASSWORD){
+   document.getElementById("unlockDiv").classList.add("hidden");
+   document.getElementById("uploadDiv").classList.remove("hidden");
+ } else alert("Wrong password");
+}
+
+let assignments=[];
+function addAssignment(){
+ let s=document.getElementById("subj").value;
+ let f=document.getElementById("fileName").value;
+ if(!s||!f) return alert("Fill all fields");
+ assignments.push({subject:s, file:f});
+ renderAssignments();
+ alert("Uploaded!");
+}
+
+function renderAssignments(){
+ let d=document.getElementById("assignmentList");
+ if(assignments.length===0){d.innerHTML="No assignments uploaded yet."; return;}
+ d.innerHTML="";
+ assignments.forEach(a=>{
+   d.innerHTML+=`<div class='card'><b>${a.subject}</b>: ${a.file}</div>`;
+ });
+}
+</script>
+
+</body>
+</html>
