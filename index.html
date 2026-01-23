@@ -4,13 +4,11 @@
     <meta charset='UTF-8'>
     <title>FirstYearHub Portal</title>
     <style>
-        /* Existing Styles */
         body { margin:0; font-family:Arial; display:flex; height:100vh; background:#f0f2f5; }
         .sidebar { width:240px; background:#0b63d6; color:white; padding:20px; }
         .sidebar h2 { margin-top:0; }
         .sidebar a { display:block; color:white; text-decoration:none; margin:12px 0; font-size:17px; }
         .main { flex:1; padding:20px; overflow-y:auto; background: white; }
-        .section { margin-bottom:25px; }
         .folder { background:#e8f0ff; padding:12px; border-radius:8px; margin:8px 0; cursor:pointer; }
         .folder-content { display:none; padding:10px 20px; }
         .sem1 { color:#0b63d6; }
@@ -20,25 +18,37 @@
         button { padding:8px 14px; background:#0b63d6; color:white; border:none; border-radius:5px; cursor:pointer; }
         .hidden { display:none !important; }
 
-        /* Login Screen Styles */
-        #login-screen {
+        /* Auth Screen Styles */
+        #auth-screen {
             position: fixed; top:0; left:0; width:100%; height:100%;
             display: flex; justify-content: center; align-items: center;
             background: #f0f2f5; z-index: 1000;
         }
         .login-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        .toggle-link { color: #0b63d6; cursor: pointer; text-decoration: underline; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
-    <div class="login-card">
+<div id="auth-screen">
+    <div class="login-card" id="login-form">
         <h2 style="color:#0b63d6">FirstYearHub</h2>
         <p>Student Login</p>
-        <input type="text" id="user" placeholder="Username (student)"><br>
-        <input type="password" id="pass" placeholder="Password (12345)"><br>
+        <input type="text" id="user" placeholder="Username"><br>
+        <input type="password" id="pass" placeholder="Password"><br>
         <button onclick="login()">Enter Portal</button>
+        <p>New here? <span class="toggle-link" onclick="toggleAuth()">Sign Up</span></p>
         <p id="err" style="color:red; font-size:13px;"></p>
+    </div>
+
+    <div class="login-card hidden" id="signup-form">
+        <h2 style="color:#0b63d6">Create Account</h2>
+        <p>Register for FirstYearHub</p>
+        <input type="text" id="signup-user" placeholder="Choose Username"><br>
+        <input type="password" id="signup-pass" placeholder="Choose Password"><br>
+        <button onclick="signup()">Register</button>
+        <p>Already a member? <span class="toggle-link" onclick="toggleAuth()">Login</span></p>
+        <p id="signup-err" style="color:red; font-size:13px;"></p>
     </div>
 </div>
 
@@ -59,49 +69,68 @@
             <h1>Welcome to FirstYearHub</h1>
             <div class='card'>A redesigned student portal with subjects, assignments, and admin upload.</div>
         </div>
-
         <div id="sem1" class="page hidden">
             <h2 class="sem1">Semester 1 Subjects</h2>
             <div class="folder" onclick="toggleFolder('p1')">Physics</div>
-            <div id="p1" class="folder-content">Physics question papers here.</div>
-            <div class="folder" onclick="toggleFolder('m1')">Maths</div>
-            <div id="m1" class="folder-content">Maths question papers here.</div>
+            <div id="p1" class="folder-content">Physics papers here.</div>
         </div>
-
-        <div id="sem2" class="page hidden">
-            <h2 class="sem2">Semester 2 Subjects</h2>
-            <div class="folder" onclick="toggleFolder('cgd')">CGD</div>
-            <div id="cgd" class="folder-content">CGD question papers here.</div>
-        </div>
-
-        <div id="assign" class="page hidden">
-            <h2>Assignments</h2>
-            <div id="assignmentList" class="card">No assignments uploaded yet.</div>
-        </div>
-
         <div id="owner" class="page hidden">
-            <h2>Owner Upload Panel</h2>
-            <div id="unlockDiv">
-                <input id="pw" placeholder="Enter owner password">
-                <button onclick="unlock()">Unlock</button>
-            </div>
-            <div id="uploadDiv" class="hidden">
-                <select id="subj">
-                    <option value="">Select Subject</option>
-                    <option>Physics</option><option>Maths</option>
-                </select><br>
-                <input id="fileName" placeholder="Enter file name"><br>
-                <button onclick="addAssignment()">Upload Assignment</button>
-            </div>
+            <h2>Owner Panel</h2>
+            <input id="pw" type="password" placeholder="Admin Password">
+            <button onclick="unlock()">Unlock</button>
         </div>
     </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
 <script>
-// LOGIN LOGIC
+// 1. FIREBASE CONFIG (REPLACE WITH YOUR ACTUAL KEYS)
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_ID",
+    appId: "YOUR_APP_ID"
+};
 
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-// NAVIGATION LOGIC
+// 2. AUTH LOGIC
+function toggleAuth() {
+    document.getElementById("login-form").classList.toggle("hidden");
+    document.getElementById("signup-form").classList.toggle("hidden");
+}
+
+function signup() {
+    let u = document.getElementById("signup-user").value;
+    let p = document.getElementById("signup-pass").value;
+    if(!u || !p) return alert("Fill all fields");
+    
+    // Firebase needs an email, so we turn "username" into "username@hub.com"
+    auth.createUserWithEmailAndPassword(u + "@hub.com", p)
+        .then(() => { alert("Success!"); enterPortal(); })
+        .catch(e => document.getElementById("signup-err").innerText = e.message);
+}
+
+function login() {
+    let u = document.getElementById("user").value;
+    let p = document.getElementById("pass").value;
+    
+    auth.signInWithEmailAndPassword(u + "@hub.com", p)
+        .then(() => enterPortal())
+        .catch(e => document.getElementById("err").innerText = "Login failed: " + e.message);
+}
+
+function enterPortal() {
+    document.getElementById("auth-screen").classList.add("hidden");
+    document.getElementById("app-wrapper").classList.remove("hidden");
+}
+
+// 3. NAVIGATION LOGIC
 function show(id){
     document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
@@ -112,54 +141,12 @@ function toggleFolder(id){
     x.style.display = x.style.display==='block' ? 'none' : 'block';
 }
 
-const OWNER_PASSWORD="admin";
 function unlock(){
-    if(document.getElementById("pw").value==OWNER_PASSWORD){
-        document.getElementById("unlockDiv").classList.add("hidden");
-        document.getElementById("uploadDiv").classList.remove("hidden");
+    if(document.getElementById("pw").value === "admin"){
+        alert("Unlocked!");
     } else alert("Wrong password");
 }
-
-let assignments=[];
-function addAssignment(){
-    let s=document.getElementById("subj").value;
-    let f=document.getElementById("fileName").value;
-    if(!s||!f) return alert("Fill all fields");
-    assignments.push({subject:s, file:f});
-    renderAssignments();
-    alert("Uploaded!");
-}
-
-function renderAssignments(){
-    let d=document.getElementById("assignmentList");
-    if(assignments.length===0){d.innerHTML="No assignments uploaded yet."; return;}
-    d.innerHTML="";
-    assignments.forEach(a=>{
-        d.innerHTML+=`<div class='card'><b>${a.subject}</b>: ${a.file}</div>`;
-    });
-}
 </script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-
-<script>
-  // PASTE YOUR CONFIG CODE FROM STEP 2 HERE
-  const firebaseConfig = { ... }; 
-  
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-</script>
-function login() {
-    let u = document.getElementById("user").value;
-    let p = document.getElementById("pass").value;
-    if(u === "student" && p === "12345") {
-        document.getElementById("login-screen").classList.add("hidden");
-        document.getElementById("app-wrapper").classList.remove("hidden");
-    } else {
-        document.getElementById("err").innerText = "Invalid Username or Password";
-    }
-}
-
 </body>
 </html>
+                
