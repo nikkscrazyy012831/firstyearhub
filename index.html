@@ -99,16 +99,7 @@
 
 <script>
 // LOGIN LOGIC
-function login() {
-    let u = document.getElementById("user").value;
-    let p = document.getElementById("pass").value;
-    if(u === "student" && p === "12345") {
-        document.getElementById("login-screen").classList.add("hidden");
-        document.getElementById("app-wrapper").classList.remove("hidden");
-    } else {
-        document.getElementById("err").innerText = "Invalid Username or Password";
-    }
-}
+
 
 // NAVIGATION LOGIC
 function show(id){
@@ -159,7 +150,16 @@ function renderAssignments(){
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 </script>
-
+function login() {
+    let u = document.getElementById("user").value;
+    let p = document.getElementById("pass").value;
+    if(u === "student" && p === "12345") {
+        document.getElementById("login-screen").classList.add("hidden");
+        document.getElementById("app-wrapper").classList.remove("hidden");
+    } else {
+        document.getElementById("err").innerText = "Invalid Username or Password";
+    }
+}
 
 </body>
 </html>
