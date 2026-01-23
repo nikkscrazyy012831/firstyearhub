@@ -148,6 +148,18 @@ function renderAssignments(){
     });
 }
 </script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+<script>
+  // PASTE YOUR CONFIG CODE FROM STEP 2 HERE
+  const firebaseConfig = { ... }; 
+  
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+</script>
+
 
 </body>
 </html>
