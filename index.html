@@ -84,10 +84,10 @@
     <h2>Owner Upload Panel</h2>
     
     <div id="unlockDiv">
-        <p>This area is for Admin only.</p>
-        <input id="pw" type="password" placeholder="Enter owner password">
-        <button onclick="unlock()">Unlock Panel</button>
+    <p>This area is for Admin only.</p>
+    <button onclick="unlock()">Verify Admin Status</button>
     </div>
+    
 
     <div id="uploadDiv" class="hidden">
         <div class="card" style="border-left: 5px solid #0b63d6;">
@@ -169,11 +169,19 @@ function toggleFolder(id){
     x.style.display = x.style.display==='block' ? 'none' : 'block';
 }
 
-function unlock(){
-    if(document.getElementById("pw").value === "admin"){
-        alert("Unlocked!");
-    } else alert("Wrong password");
+// Updated Owner Panel Security
+function unlock() {
+    const user = firebase.auth().currentUser;
+    
+    // This checks the actual Firebase account, not just a typed password
+    if (user && user.email === "admin@hub.com") {
+        document.getElementById("unlockDiv").classList.add("hidden");
+        document.getElementById("uploadDiv").classList.remove("hidden");
+    } else {
+        alert("Access Denied: You must be logged in as admin@hub.com");
+    }
 }
+    
 </script>
         // 1. NAVIGATION LOGIC
 // Switches between different sections (Dashboard, Sem1, etc.)
