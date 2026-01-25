@@ -5,20 +5,18 @@
     <title>FirstYearHub Portal</title>
     <style>
         body { margin:0; font-family:Arial; display:flex; height:100vh; background:#f0f2f5; }
-        .sidebar { width:240px; background:#0b63d6; color:white; padding:20px; }
+        .sidebar { width:240px; background:#0b63d6; color:white; padding:20px; flex-shrink: 0; }
         .sidebar h2 { margin-top:0; }
         .sidebar a { display:block; color:white; text-decoration:none; margin:12px 0; font-size:17px; }
         .main { flex:1; padding:20px; overflow-y:auto; background: white; }
-        .folder { background:#e8f0ff; padding:12px; border-radius:8px; margin:8px 0; cursor:pointer; }
-        .folder-content { display:none; padding:10px 20px; }
-        .sem1 { color:#0b63d6; }
-        .sem2 { color:#0a8a3a; }
-        .card { background:#f5f5f5; padding:15px; border-radius:8px; margin:10px 0; }
-        input, select { padding:8px; margin:6px 0; width:250px; border:1px solid #ccc; border-radius:4px; }
+        .card { background:#f5f5f5; padding:15px; border-radius:8px; margin:10px 0; border: 1px solid #ddd; }
+        input, select { padding:8px; margin:6px 0; width:250px; border:1px solid #ccc; border-radius:4px; display: block; }
         button { padding:8px 14px; background:#0b63d6; color:white; border:none; border-radius:5px; cursor:pointer; }
+        .btn-red { background: #d93025; margin-left: 5px; }
+        .btn-green { background: #0a8a3a; }
         .hidden { display:none !important; }
 
-        /* Auth Screen Styles */
+        /* Auth Screen */
         #auth-screen {
             position: fixed; top:0; left:0; width:100%; height:100%;
             display: flex; justify-content: center; align-items: center;
@@ -34,8 +32,8 @@
     <div class="login-card" id="login-form">
         <h2 style="color:#0b63d6">FirstYearHub</h2>
         <p>Student Login</p>
-        <input type="text" id="user" placeholder="Username"><br>
-        <input type="password" id="pass" placeholder="Password"><br>
+        <input type="text" id="user" placeholder="Username">
+        <input type="password" id="pass" placeholder="Password">
         <button onclick="login()">Enter Portal</button>
         <p>New here? <span class="toggle-link" onclick="toggleAuth()">Sign Up</span></p>
         <p id="err" style="color:red; font-size:13px;"></p>
@@ -43,9 +41,8 @@
 
     <div class="login-card hidden" id="signup-form">
         <h2 style="color:#0b63d6">Create Account</h2>
-        <p>Register for FirstYearHub</p>
-        <input type="text" id="signup-user" placeholder="Choose Username"><br>
-        <input type="password" id="signup-pass" placeholder="Choose Password"><br>
+        <input type="text" id="signup-user" placeholder="Choose Username">
+        <input type="password" id="signup-pass" placeholder="Choose Password">
         <button onclick="signup()">Register</button>
         <p>Already a member? <span class="toggle-link" onclick="toggleAuth()">Login</span></p>
         <p id="signup-err" style="color:red; font-size:13px;"></p>
@@ -58,7 +55,6 @@
         <a href="#" onclick="show('dash')">Dashboard</a>
         <a href="#" onclick="show('sem1')">Semester 1</a>
         <a href="#" onclick="show('sem2')">Semester 2</a>
-        <a href="#" onclick="show('assign')">Assignments</a>
         <a href="#" onclick="show('owner')">Owner Panel</a>
         <hr>
         <a href="#" onclick="location.reload()" style="font-size:14px; opacity:0.8;">Logout</a>
@@ -67,67 +63,61 @@
     <div class="main">
         <div id="dash" class="page">
             <h1>Welcome to FirstYearHub</h1>
-            <div class='card'>A redesigned student portal with subjects, assignments, and admin upload.</div>
+            <div class='card'>Select a semester from the sidebar to view study materials.</div>
         </div>
+
         <div id="sem1" class="page hidden">
-    <h2 class="sem1">Semester 1 Subjects</h2>
-    <div id="sem1-list">
+            <h2 style="color:#0b63d6">Semester 1</h2>
+            <div id="sem1-list"></div>
         </div>
-</div>
 
-<div id="sem2" class="page hidden">
-    <h2 class="sem2">Semester 2 Subjects</h2>
-    <div id="sem2-list">
+        <div id="sem2" class="page hidden">
+            <h2 style="color:#0a8a3a">Semester 2</h2>
+            <div id="sem2-list"></div>
         </div>
-</div>
-<div id="owner" class="page hidden">
-    <h2>Owner Upload Panel</h2>
-    
-    <div id="unlockDiv">
-    <p>This area is for Admin only.</p>
-    <button onclick="unlock()">Verify Admin Status</button>
-    </div>
-    
 
-    <div id="uploadDiv" class="hidden">
-        <div class="card" style="border-left: 5px solid #0b63d6;">
-            <h3>Post New Material</h3>
+        <div id="owner" class="page hidden">
+            <h2>Owner Upload Panel</h2>
+            <div id="unlockDiv">
+                <p>Verify admin credentials to post or delete items.</p>
+                <button onclick="unlock()">Verify Admin Status</button>
+            </div>
             
-            <label>1. Select Group:</label><br>
-            <select id="groupSelect">
-                <option value="sem1">Semester 1</option>
-                <option value="sem2">Semester 2</option>
-            </select><br><br>
-
-            <label>2. Details:</label><br>
-            <input id="fileTitle" placeholder="Title (e.g., Physics Unit 1 Notes)"><br>
-            <input id="fileLink" placeholder="Google Drive Link"><br>
-            
-            <button onclick="addAssignment()" style="margin-top:10px; width:250px;">🚀 Post to Student Portal</button>
+            <div id="uploadDiv" class="hidden">
+                <div class="card" style="border-left: 5px solid #0b63d6;">
+                    <h3>Post New Material</h3>
+                    <select id="groupSelect">
+                        <option value="sem1">Semester 1</option>
+                        <option value="sem2">Semester 2</option>
+                    </select>
+                    <input id="fileTitle" placeholder="Title (e.g., Physics Notes)">
+                    <input id="fileLink" placeholder="Google Drive Link">
+                    <button onclick="addAssignment()">🚀 Post to Portal</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <script>
-// 1. FIREBASE CONFIG (REPLACE WITH YOUR ACTUAL KEYS)
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// 1. CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyBX-2s2pnSe8gNpfmi2_iM3flLaDtB73Fc",
   authDomain: "firstyearhub-59a34.firebaseapp.com",
   projectId: "firstyearhub-59a34",
   storageBucket: "firstyearhub-59a34.firebasestorage.app",
   messagingSenderId: "981407607831",
-  appId: "1:981407607831:web:6bcaf8ca714d39b05d8052",
-  measurementId: "G-L1MVVG74CK"
+  appId: "1:981407607831:web:6bcaf8ca714d39b05d8052"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+const db = firebase.firestore();
 
-// 2. AUTH LOGIC
+// 2. AUTH
 function toggleAuth() {
     document.getElementById("login-form").classList.toggle("hidden");
     document.getElementById("signup-form").classList.toggle("hidden");
@@ -137,20 +127,17 @@ function signup() {
     let u = document.getElementById("signup-user").value;
     let p = document.getElementById("signup-pass").value;
     if(!u || !p) return alert("Fill all fields");
-    
-    // Firebase needs an email, so we turn "username" into "username@hub.com"
     auth.createUserWithEmailAndPassword(u + "@hub.com", p)
-        .then(() => { alert("Success!"); enterPortal(); })
+        .then(() => enterPortal())
         .catch(e => document.getElementById("signup-err").innerText = e.message);
 }
 
 function login() {
     let u = document.getElementById("user").value;
     let p = document.getElementById("pass").value;
-    
     auth.signInWithEmailAndPassword(u + "@hub.com", p)
         .then(() => enterPortal())
-        .catch(e => document.getElementById("err").innerText = "Login failed: " + e.message);
+        .catch(e => document.getElementById("err").innerText = e.message);
 }
 
 function enterPortal() {
@@ -158,107 +145,69 @@ function enterPortal() {
     document.getElementById("app-wrapper").classList.remove("hidden");
 }
 
-// 3. NAVIGATION LOGIC
+// 3. NAVIGATION
 function show(id){
     document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
 }
 
-function toggleFolder(id){
-    let x=document.getElementById(id);
-    x.style.display = x.style.display==='block' ? 'none' : 'block';
-}
-
-// Updated Owner Panel Security
+// 4. ADMIN LOGIC
 function unlock() {
     const user = firebase.auth().currentUser;
-    
-    // This checks the actual Firebase account, not just a typed password
     if (user && user.email === "admin@hub.com") {
         document.getElementById("unlockDiv").classList.add("hidden");
         document.getElementById("uploadDiv").classList.remove("hidden");
     } else {
-        alert("Access Denied: You must be logged in as admin@hub.com");
-    }
-}
-    
-</script>
-        // 1. NAVIGATION LOGIC
-// Switches between different sections (Dashboard, Sem1, etc.)
-function show(id){
-    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-}
-
-// 2. OWNER PANEL SECURITY
-const OWNER_PASSWORD = "admin"; // You can change this to your choice
-function unlock() {
-    let enteredPw = document.getElementById("pw").value;
-    if(enteredPw === OWNER_PASSWORD) {
-        document.getElementById("unlockDiv").classList.add("hidden");
-        document.getElementById("uploadDiv").classList.remove("hidden");
-    } else {
-        alert("Incorrect Admin Password");
+        alert("Access Denied: Log in as admin@hub.com first.");
     }
 }
 
-// 3. UPLOAD TO CLOUD (Owner Action)
 function addAssignment() {
     let group = document.getElementById("groupSelect").value;
     let title = document.getElementById("fileTitle").value;
     let url = document.getElementById("fileLink").value;
-    
-    if(!title || !url) return alert("Please fill in all details!");
+    if(!title || !url) return alert("Fill details!");
 
-    // Save data to Firebase Firestore
     db.collection("assignments").add({
-        group: group,
-        title: title,
-        url: url,
+        group: group, title: title, url: url,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
-        alert("Successfully posted to " + group + "!");
-        // Clear the inputs for next time
+    }).then(() => {
+        alert("Posted!");
         document.getElementById("fileTitle").value = "";
         document.getElementById("fileLink").value = "";
-    })
-    .catch(e => alert("Error saving: " + e.message));
+    });
 }
 
-// 4. REAL-TIME SORTING (Student View)
-// This "Listens" to the cloud. If you add a file, it appears instantly!
-db.collection("assignments").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-    const sem1Area = document.getElementById("sem1-list");
-    const sem2Area = document.getElementById("sem2-list");
+function deleteItem(id) {
+    if(confirm("Delete this item?")) {
+        db.collection("assignments").doc(id).delete();
+    }
+}
 
-    // Clear old data
-    sem1Area.innerHTML = "";
-    sem2Area.innerHTML = "";
+// 5. DATA SYNC
+db.collection("assignments").orderBy("timestamp", "desc").onSnapshot(snapshot => {
+    const s1 = document.getElementById("sem1-list");
+    const s2 = document.getElementById("sem2-list");
+    s1.innerHTML = ""; s2.innerHTML = "";
+    
+    const user = firebase.auth().currentUser;
+    const isAdmin = user && user.email === "admin@hub.com";
 
-    snapshot.forEach((doc) => {
+    snapshot.forEach(doc => {
         let data = doc.data();
-        let cardHTML = `
+        let delBtn = isAdmin ? `<button class="btn-red" onclick="deleteItem('${doc.id}')">Delete</button>` : "";
+        
+        let html = `
             <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                <div><strong>${data.title}</strong></div>
                 <div>
-                    <strong style="font-size:16px;">${data.title}</strong><br>
-                    <small style="color:gray;">Added: ${data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'Just now'}</small>
+                    <a href="${data.url}" target="_blank"><button class="btn-green">View</button></a>
+                    ${delBtn}
                 </div>
-                <a href="${data.url}" target="_blank">
-                    <button style="background:#0a8a3a;">View File</button>
-                </a>
-            </div>
-        `;
-
-        // Check the 'group' tag and put it in the right list
-        if (data.group === "sem1") {
-            sem1Area.innerHTML += cardHTML;
-        } else {
-            sem2Area.innerHTML += cardHTML;
-        }
+            </div>`;
+        (data.group === "sem1") ? s1.innerHTML += html : s2.innerHTML += html;
     });
 });
-
+</script>
 </body>
 </html>
-                
