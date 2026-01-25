@@ -10,6 +10,7 @@
         .sidebar a { display:block; color:white; text-decoration:none; margin:12px 0; font-size:17px; }
         .main { flex:1; padding:20px; overflow-y:auto; background: white; }
         .card { background:#f5f5f5; padding:15px; border-radius:8px; margin:10px 0; border: 1px solid #ddd; }
+        .category-header { background: #0b63d6; color: white; padding: 8px 15px; border-radius: 5px; margin-top: 20px; }
         input, select { padding:8px; margin:6px 0; width:250px; border:1px solid #ccc; border-radius:4px; display: block; }
         button { padding:8px 14px; background:#0b63d6; color:white; border:none; border-radius:5px; cursor:pointer; }
         .btn-red { background: #d93025; margin-left: 5px; }
@@ -23,7 +24,6 @@
             background: #f0f2f5; z-index: 1000;
         }
         .login-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
-        .toggle-link { color: #0b63d6; cursor: pointer; text-decoration: underline; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -35,7 +35,7 @@
         <input type="text" id="user" placeholder="Username">
         <input type="password" id="pass" placeholder="Password">
         <button onclick="login()">Enter Portal</button>
-        <p>New here? <span class="toggle-link" onclick="toggleAuth()">Sign Up</span></p>
+        <p>New here? <span onclick="toggleAuth()" style="color:#0b63d6; cursor:pointer;">Sign Up</span></p>
         <p id="err" style="color:red; font-size:13px;"></p>
     </div>
 
@@ -44,7 +44,7 @@
         <input type="text" id="signup-user" placeholder="Choose Username">
         <input type="password" id="signup-pass" placeholder="Choose Password">
         <button onclick="signup()">Register</button>
-        <p>Already a member? <span class="toggle-link" onclick="toggleAuth()">Login</span></p>
+        <p>Already a member? <span onclick="toggleAuth()" style="color:#0b63d6; cursor:pointer;">Login</span></p>
         <p id="signup-err" style="color:red; font-size:13px;"></p>
     </div>
 </div>
@@ -63,34 +63,52 @@
     <div class="main">
         <div id="dash" class="page">
             <h1>Welcome to FirstYearHub</h1>
-            <div class='card'>Select a semester from the sidebar to view study materials.</div>
+            <div class='card'>Access Notes, Question Papers, and Assignments from the sidebar.</div>
         </div>
 
         <div id="sem1" class="page hidden">
             <h2 style="color:#0b63d6">Semester 1</h2>
-            <div id="sem1-list"></div>
+            <div class="category-header">📚 Subject Notes</div>
+            <div id="sem1-notes"></div>
+            <div class="category-header">📝 Question Papers</div>
+            <div id="sem1-papers"></div>
+            <div class="category-header">📎 Assignments</div>
+            <div id="sem1-assigns"></div>
         </div>
 
         <div id="sem2" class="page hidden">
             <h2 style="color:#0a8a3a">Semester 2</h2>
-            <div id="sem2-list"></div>
+            <div class="category-header">📚 Subject Notes</div>
+            <div id="sem2-notes"></div>
+            <div class="category-header">📝 Question Papers</div>
+            <div id="sem2-papers"></div>
+            <div class="category-header">📎 Assignments</div>
+            <div id="sem2-assigns"></div>
         </div>
 
         <div id="owner" class="page hidden">
             <h2>Owner Upload Panel</h2>
             <div id="unlockDiv">
-                <p>Verify admin credentials to post or delete items.</p>
                 <button onclick="unlock()">Verify Admin Status</button>
             </div>
             
             <div id="uploadDiv" class="hidden">
                 <div class="card" style="border-left: 5px solid #0b63d6;">
                     <h3>Post New Material</h3>
+                    <label>Semester:</label>
                     <select id="groupSelect">
                         <option value="sem1">Semester 1</option>
                         <option value="sem2">Semester 2</option>
                     </select>
-                    <input id="fileTitle" placeholder="Title (e.g., Physics Notes)">
+                    
+                    <label>Category:</label>
+                    <select id="catSelect">
+                        <option value="notes">Subject Notes</option>
+                        <option value="papers">Question Papers</option>
+                        <option value="assigns">Assignment</option>
+                    </select>
+
+                    <input id="fileTitle" placeholder="Title (e.g., Chemistry Unit 1)">
                     <input id="fileLink" placeholder="Google Drive Link">
                     <button onclick="addAssignment()">🚀 Post to Portal</button>
                 </div>
@@ -104,7 +122,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <script>
-// 1. CONFIG
+// FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyBX-2s2pnSe8gNpfmi2_iM3flLaDtB73Fc",
   authDomain: "firstyearhub-59a34.firebaseapp.com",
@@ -117,84 +135,77 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// 2. AUTH
+// AUTH LOGIC
 function toggleAuth() {
     document.getElementById("login-form").classList.toggle("hidden");
     document.getElementById("signup-form").classList.toggle("hidden");
 }
-
 function signup() {
     let u = document.getElementById("signup-user").value;
     let p = document.getElementById("signup-pass").value;
-    if(!u || !p) return alert("Fill all fields");
-    auth.createUserWithEmailAndPassword(u + "@hub.com", p)
-        .then(() => enterPortal())
-        .catch(e => document.getElementById("signup-err").innerText = e.message);
+    auth.createUserWithEmailAndPassword(u + "@hub.com", p).then(() => enterPortal()).catch(e => alert(e.message));
 }
-
 function login() {
     let u = document.getElementById("user").value;
     let p = document.getElementById("pass").value;
-    auth.signInWithEmailAndPassword(u + "@hub.com", p)
-        .then(() => enterPortal())
-        .catch(e => document.getElementById("err").innerText = e.message);
+    auth.signInWithEmailAndPassword(u + "@hub.com", p).then(() => enterPortal()).catch(e => alert(e.message));
 }
-
 function enterPortal() {
     document.getElementById("auth-screen").classList.add("hidden");
     document.getElementById("app-wrapper").classList.remove("hidden");
 }
 
-// 3. NAVIGATION
+// NAVIGATION
 function show(id){
     document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
     document.getElementById(id).classList.remove('hidden');
 }
 
-// 4. ADMIN LOGIC
+// ADMIN FUNCTIONS
 function unlock() {
     const user = firebase.auth().currentUser;
     if (user && user.email === "admin@hub.com") {
         document.getElementById("unlockDiv").classList.add("hidden");
         document.getElementById("uploadDiv").classList.remove("hidden");
     } else {
-        alert("Access Denied: Log in as admin@hub.com first.");
+        alert("Access Denied: Log in as admin@hub.com");
     }
 }
 
 function addAssignment() {
     let group = document.getElementById("groupSelect").value;
+    let cat = document.getElementById("catSelect").value;
     let title = document.getElementById("fileTitle").value;
     let url = document.getElementById("fileLink").value;
+
     if(!title || !url) return alert("Fill details!");
 
     db.collection("assignments").add({
-        group: group, title: title, url: url,
+        group: group, category: cat, title: title, url: url,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-        alert("Posted!");
+        alert("Success!");
         document.getElementById("fileTitle").value = "";
         document.getElementById("fileLink").value = "";
     });
 }
 
 function deleteItem(id) {
-    if(confirm("Delete this item?")) {
-        db.collection("assignments").doc(id).delete();
-    }
+    if(confirm("Delete?")) db.collection("assignments").doc(id).delete();
 }
 
-// 5. DATA SYNC
+// REAL-TIME DATA SYNC
 db.collection("assignments").orderBy("timestamp", "desc").onSnapshot(snapshot => {
-    const s1 = document.getElementById("sem1-list");
-    const s2 = document.getElementById("sem2-list");
-    s1.innerHTML = ""; s2.innerHTML = "";
-    
+    // Clear all containers
+    const containers = ["sem1-notes", "sem1-papers", "sem1-assigns", "sem2-notes", "sem2-papers", "sem2-assigns"];
+    containers.forEach(id => document.getElementById(id).innerHTML = "");
+
     const user = firebase.auth().currentUser;
     const isAdmin = user && user.email === "admin@hub.com";
 
     snapshot.forEach(doc => {
         let data = doc.data();
+        let targetId = `${data.group}-${data.category}`;
         let delBtn = isAdmin ? `<button class="btn-red" onclick="deleteItem('${doc.id}')">Delete</button>` : "";
         
         let html = `
@@ -205,9 +216,13 @@ db.collection("assignments").orderBy("timestamp", "desc").onSnapshot(snapshot =>
                     ${delBtn}
                 </div>
             </div>`;
-        (data.group === "sem1") ? s1.innerHTML += html : s2.innerHTML += html;
+        
+        let container = document.getElementById(targetId);
+        if(container) container.innerHTML += html;
     });
 });
 </script>
 </body>
 </html>
+
+
